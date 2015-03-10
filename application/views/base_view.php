@@ -22,6 +22,7 @@ and open the template in the editor.
         <script type="text/javascript" src="<?php echo base_url(); ?>assets/js/jquery.validate.min.js"></script>
         <script type="text/javascript" src="<?php echo base_url(); ?>assets/js/moment.min.js"></script>
         <script type="text/javascript" src="<?php echo base_url(); ?>assets/js/daterangepicker.js"></script>
+        <script type="text/javascript" src="<?php echo base_url(); ?>assets/js/bootstrap.min.js"></script>
     </body>
 </html>
 

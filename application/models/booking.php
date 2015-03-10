@@ -7,8 +7,7 @@ class Booking extends MY_Model {
     public $last_name;
     public $address;
     public $phone;
-    public $date_from;
-    public $date_to;
+    public $planned_stay;
     public $last_updated;
     public $date_created;
 }

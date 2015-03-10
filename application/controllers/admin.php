@@ -10,21 +10,21 @@ class Admin extends CI_Controller {
     public function dashboard() {
         $this->load->model('booking');
         $this->load->model('room');
-        
+
         $rows = $this->booking->get_all();
         foreach ($rows as $row) {
             $booking = new Booking();
             $booking->populate($row);
             $bookings[] = $booking;
         }
-        
+
         $rows = $this->room->get_all();
         foreach ($rows as $row) {
             $room = new Room();
             $room->populate($row);
             $rooms[] = $room;
         }
-        
+
         $view_data = [
             'bookings' => $bookings,
             'rooms' => $rooms
@@ -37,9 +37,8 @@ class Admin extends CI_Controller {
         $this->load->model('room');
         $view_data = [];
         $view_data['rooms'] = $this->_get_rooms();
-        
         if ($type === 'room') {
-            $room = new $room;
+            $room = new Room();
             if ($id !== null) {
                 $room->populate($this->room->get($id));
             }
@@ -48,16 +47,14 @@ class Admin extends CI_Controller {
             }
             $view_data['room'] = $room;
         } else {
-
-            //if ($type === 'customer')
             //Load booking class to prepopulate
             $this->load->model('booking');
             $booking = new Booking();
-//obtain booking by id
-//            if ($id !== null) {
-//                $booking->populate($this->booking->get($id));
-//            } 
-//Check if a record has been submitted
+            //Obtain booking by id
+            if ($id !== null) {
+                $booking->populate($this->booking->get($id));
+            }
+            //Check if a record has been submitted
             if ($this->input->post('submit')) {
                 $this->_save_booking($id);
             }
@@ -70,10 +67,11 @@ class Admin extends CI_Controller {
         //Obtain all rooms
         $rows = $this->room->get_all();
         if ($rows) {
+            $rooms[] = 'Room';
             foreach ($rows as $row) {
                 $room = new Room();
                 $room->populate($row);
-                $rooms[] = $room;
+                $rooms[$room->id] = $room->name;
             }
         } else {
             $rooms[] = 'No rooms found';
@@ -84,9 +82,12 @@ class Admin extends CI_Controller {
     private function _save_room($id) {
         $data = [
             'name' => $this->input->post('name'),
+            'last_modified' => now()
         ];
 
-        $this->room->save($id, $data);
+        $this->room->save($data, $id);
+        $this->session->set_flashdata('result', 'Room saved successfully');
+        redirect(base_url() . 'index.php/admin/dashboard');
     }
 
     private function _save_booking($id) {
@@ -96,11 +97,12 @@ class Admin extends CI_Controller {
             'last_name' => $this->input->post('last_name'),
             'address' => $this->input->post('address'),
             'phone' => $this->input->post('phone'),
-            'date_from' => $this->input->post('date_from'),
-            'date_to' => $this->input->post('date_to'),
+            'planned_stay' => $this->input->post('planned_stay'),
             'last_updated' => now()
         ];
         $this->booking->save($data, $id);
+        $this->session->set_flashdata('result', 'Booking saved successfully'); 
+        redirect(base_url() . 'index.php/admin/dashboard');
     }
 
 }

@@ -1,10 +1,10 @@
 <section>
-    
+
     <h1>Administration</h1>
 
     <?php
-    if ($this->session->flashdata('result') != '') {
-        echo $this->session->flashdata('result');
+    if ($this->session->flashdata('success')) {
+        echo '<div class="alert alert-success"><p>'.$this->session->flashdata('success').'</p></div>';
     }
     ?>
 
@@ -23,13 +23,7 @@
             <div role="tabpanel" class="tab-pane fade in active" id="bookings">
                 <?php
                 if ($bookings) {
-                    foreach ($bookings as $booking) {
-                        echo '<h3>' . $booking->first_name . ' ' . $booking->last_name . '</h3>';
-                        if ($booking->planned_stay) {
-                            echo '<p>' . $booking->planned_stay . '</p>';
-                        }
-                        echo '<a href="'.base_url().'index.php/admin/add_edit/booking/'.$booking->id.'">Edit</a>';
-                    }
+                    echo $this->table->generate($table_array);
                 }
                 ?>
             </div>

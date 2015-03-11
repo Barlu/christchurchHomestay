@@ -1,5 +1,4 @@
-<div id='contentWrapper'>
-    <?php $this->load->view('partials/header'); ?>
+<div id='admin-contentWrapper'>
     <?php $this->load->view($view); ?>
 </div>
 

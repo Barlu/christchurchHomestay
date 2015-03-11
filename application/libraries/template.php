@@ -114,12 +114,12 @@ class Template {
      * @return  void
      */
     public function load_view($view, $data = array(), $return = FALSE) {
-        // Not include master view on ajax request
+// Not include master view on ajax request
         if ($this->_ci->input->is_ajax_request()) {
             $this->_ci->load->view($view, $data);
             return;
         }
-        // Title
+// Title
         if (empty($this->summary)) {
             if (empty($this->title)) {
                 $data['title'] = $this->brand_name;
@@ -133,9 +133,9 @@ class Template {
                 $data['title'] = $this->title . $this->title_separator . $this->brand_name . $this->title_separator . $this->summary;
             }
         }
-        // Description
+// Description
         $data['description'] = $this->description;
-        // Metadata
+// Metadata
         $metadata = array();
         foreach ($this->metadata as $name => $content) {
             if (strpos($name, 'og:') === 0) {
@@ -145,27 +145,30 @@ class Template {
             }
         }
         $data['metadata'] = implode('', $metadata);
-        // Javascript
+// Javascript
         $js = array();
         foreach ($this->js as $js_file) {
             $js[] = '<script src="' . assets_url('js/' . $js_file) . '"></script>';
         }
         $data['js'] = implode('', $js);
-        
-        // CSS
+
+// CSS
         $css = array();
         foreach ($this->css as $css_file) {
             $css[] = '<link rel="stylesheet" href="' . assets_url('css/' . $css_file) . '">';
         }
         $data['css'] = implode('', $css);
-        
-        //GA ID
+
+//GA ID
         $data['ga_id'] = $this->ga_id;
-        
-        //Add view to data
+
+//Add view to data
         $data['view'] = $view;
-        
-        //Add body
+
+        if (strpos(uri_string(), 'admin') !== FALSE) {
+            $this->layout = 'admin';
+        }
+//Add body
         $data['body'] = $this->_ci->load->view('layout/' . $this->layout, $data, true);
 
         return $this->_ci->load->view('base_view', $data, $return);

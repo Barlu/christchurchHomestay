@@ -51,40 +51,66 @@
                     ], set_value('last_name', $booking->last_name));
             ?>
         </div>
-        <!--        ADDRESS-->
+        <!--        AGE-->
+        <div class="form-group col-xs-4 has-feedback">
+            <?php
+            echo form_label('Age', 'age', [
+                'class' => 'control-label sr-only'
+            ]);
+            echo form_input([
+                'name' => 'age',
+                'id' => 'age',
+                'class' => 'form-control input-lg',
+                'placeholder' => 'Age',
+                'data-toggle' => 'tooltip'
+                    ], set_value('age', $booking->age));
+            ?>
+        </div>
+        <!--        NATIONALITY-->
+        <div class="form-group col-xs-4 has-feedback">
+            <?php
+            echo form_label('Nationality', 'nationality', [
+                'class' => 'control-label sr-only'
+            ]);
+            echo form_input([
+                'name' => 'nationality',
+                'id' => 'nationality',
+                'class' => 'form-control input-lg',
+                'placeholder' => 'Nationality',
+                'data-toggle' => 'tooltip'
+                    ], set_value('nationality', $booking->nationality));
+            ?>
+        </div>
+        <!--        GENDER-->
+        <div class="form-group col-xs-4 col-md-4 has-feedback">
+            <?php
+            echo form_label('Gender', 'phone', [
+                'class' => 'control-label sr-only'
+            ]);
+            echo form_dropdown('gender', [FALSE => 'Gender', 'male' => 'Male','female' => 'Female'], set_value('gender', $booking->gender), 'id = "gender" class = "form-control input-lg"')
+            ?>
+        </div>
+        <!--        EDUCATION PROVIDER-->
         <div class="form-group col-xs-12 has-feedback">
             <?php
-            echo form_label('Address', 'address', [
+            echo form_label('Education Provider', 'education_provider', [
                 'class' => 'control-label sr-only'
             ]);
             echo form_input([
-                'name' => 'address',
-                'id' => 'address',
+                'name' => 'education_provider',
+                'id' => 'education_provider',
                 'class' => 'form-control input-lg',
-                'placeholder' => 'Address',
+                'placeholder' => 'Education Provider',
                 'data-toggle' => 'tooltip'
-                    ], set_value('address', $booking->address));
+                    ], set_value('education_provider', $booking->education_provider));
             ?>
         </div>
-        <!--        PHONE-->
-        <div class="form-group col-xs-12 col-md-4 has-feedback">
-            <?php
-            echo form_label('Phone', 'phone', [
-                'class' => 'control-label sr-only'
-            ]);
-            echo form_input([
-                'name' => 'phone',
-                'id' => 'phone',
-                'class' => 'form-control input-lg',
-                'placeholder' => 'Phone',
-                'data-toggle' => 'tooltip'
-                    ], set_value('phone', $booking->phone));
-            ?>
-        </div>
+        
+        
         <!--        DATE RANGE PICKER-->
         <div id="datepicker" class="form-group col-xs-12 col-md-4 has-feedback">
             <?php
-            echo form_label('Planned Stay', 'planned_stay', [
+            echo form_label('Dates', 'dates', [
                 'onclick' => "$('#date').focus()",
                 'class' => 'sr-only'
             ]);
@@ -93,12 +119,12 @@
                 <span onclick="$('#date').focus()" class="input-group-addon"><i class="fa fa-calendar"></i></span>
                 <?php
                 echo form_input([
-                    'name' => 'planned_stay',
-                    'id' => 'planned_stay',
+                    'name' => 'dates',
+                    'id' => 'dates',
                     'class' => 'form-control input-lg  ',
                     'data-toggle' => 'tooltip',
-                    'placeholder' => 'Planned Stay'
-                        ], set_value('planned_stay', $booking->planned_stay));
+                    'placeholder' => 'Dates'
+                        ], set_value('dates', $booking->dates));
                 ?>
             </div>
         </div>
@@ -112,12 +138,35 @@
             echo form_dropdown('room_id', $rooms, set_value('room_id', $booking->room_id), 'id = "room_id" class = "form-control input-lg" placeholder = "Room" data-toggle = "tooltip"');
             ?>
         </div>
+        <!--        STATUS-->
+        <div class="form-group col-xs-12 col-md-4 has-feedback">
+            <?php
+            echo form_label('Status', 'status', [
+                'class' => 'control-label sr-only'
+            ]);
+            echo form_dropdown('status', $status, set_value('status', $booking->status), 'id = "status" class = "form-control input-lg" placeholder = "Status" data-toggle = "tooltip"');
+            ?>
+        </div>
+        <!--        ARCHIVE-->
+        <div class="form-group float-wrap pull-right">
+            <?php
+            echo form_label('Archive', 'archive', [
+                'class' => 'checkbox-inline'
+            ]);
+            echo form_checkbox('archive', 1, set_value('archive', [$booking->archive, 0]), 'class = "checkbox-inline"');
+            
+            
+            
+            
+            
+            ?>
+        </div>
         <!--        Hidden - Id-->
         <?php
         echo form_hidden('booking', set_value($booking->id));
     }
     ?>
-    <div class="btn-wrap pull-right">
+    <div class="float-wrap pull-right ">
         <button type="button" class="btn btn-default btn-lg" id="cancel" name="cancel" onclick="my_redirect('<?php echo base_url();?>index.php/admin/dashboard')">Cancel</button>
         <?php
         echo form_submit([
@@ -130,8 +179,8 @@
     echo form_close();
     ?>
     <script>
-        $(document).ready(function() {
-            $('#planned_stay').daterangepicker({
+        $(function() {
+            $('#dates').daterangepicker({
                 format: 'DD/MM/YYYY',
                 showDropdowns: true,
                 showWeekNumbers: true,
@@ -145,6 +194,12 @@
         function my_redirect(url){
             location.href= url;
         }
+        
+        $(function(){
+            $('#gender :first-child').prop('disabled', true);
+            $('#room_id :first-child').prop('disabled', true);
+            $('#status :first-child').prop('disabled', true);
+        });
         
     </script>
 </div>

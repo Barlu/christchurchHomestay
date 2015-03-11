@@ -10,6 +10,7 @@ class Admin extends CI_Controller {
     public function dashboard() {
         $this->load->model('booking');
         $this->load->model('room');
+        $this->load->library('table');
 
         $rows = $this->booking->get_all();
         foreach ($rows as $row) {
@@ -24,19 +25,52 @@ class Admin extends CI_Controller {
             $room->populate($row);
             $rooms[] = $room;
         }
+        
+        $this->table->set_template([
+            'table_open' => '<table id="booking-display" class="table table-hover">']);
+        $table_array = [
+            [
+                'First Name', 'Last Name', 'Age', 'Nationality', 'Gender', 'Education Provider', 'Room', 'Dates', 'Status', 'Edit'
+            ]
+        ];
+
+        foreach ($bookings as $booking) {
+            if ($booking->room) {
+                $row = $this->room->get($booking->room_id);
+            }
+            $room = new Room();
+            $room->populate($row);
+            $table_array[] = [
+                $booking->first_name,
+                $booking->last_name,
+                $booking->age,
+                $booking->nationality,
+                $booking->gender,
+                $booking->education_provider,
+                $room->name,
+                $booking->dates,
+                $booking->status,
+                '<a href="'. base_url() . 'index.php/admin/add_edit/booking/'. $booking->id . '"><i class="fa fa-pencil-square-o"></i></a>'
+            ];
+        }
 
         $view_data = [
             'bookings' => $bookings,
-            'rooms' => $rooms
+            'rooms' => $rooms,
+            'table_array' => $table_array
         ];
         $this->template->load_view('dashboard', $view_data);
     }
 
     public function add_edit($type = null, $id = null) {
+        //Load needed models/helpers/libraries
         $this->load->helper('form');
         $this->load->model('room');
+        //Set vars
         $view_data = [];
+        $view_data['status'] = ['Not Selected' => 'Status', 'Pending' => 'Pending', 'Confirmed' => 'Confirmed', 'indefinate' => 'Indefinate'];
         $view_data['rooms'] = $this->_get_rooms();
+
         if ($type === 'room') {
             $room = new Room();
             if ($id !== null) {
@@ -86,7 +120,7 @@ class Admin extends CI_Controller {
         ];
 
         $this->room->save($data, $id);
-        $this->session->set_flashdata('result', 'Room saved successfully');
+        $this->session->set_flashdata('success', 'Room saved successfully');
         redirect(base_url() . 'index.php/admin/dashboard');
     }
 
@@ -95,13 +129,19 @@ class Admin extends CI_Controller {
             'room_id' => $this->input->post('room_id'),
             'first_name' => $this->input->post('first_name'),
             'last_name' => $this->input->post('last_name'),
-            'address' => $this->input->post('address'),
-            'phone' => $this->input->post('phone'),
-            'planned_stay' => $this->input->post('planned_stay'),
+            'nationality' => $this->input->post('nationality'),
+            'gender' => $this->input->post('gender'),
+            'age' => $this->input->post('age'),
+            'education_provider' => $this->input->post('education_provider'),
+            'dates' => $this->input->post('dates'),
+            'status' => $this->input->post('status'),
             'last_updated' => now()
         ];
+        if ($this->input->post('id')) {
+            $id = $this->input->post('id');
+        }
         $this->booking->save($data, $id);
-        $this->session->set_flashdata('result', 'Booking saved successfully'); 
+        $this->session->set_flashdata('success', 'Booking saved successfully');
         redirect(base_url() . 'index.php/admin/dashboard');
     }
 

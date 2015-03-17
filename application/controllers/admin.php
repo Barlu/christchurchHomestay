@@ -12,6 +12,9 @@ class Admin extends CI_Controller {
         $this->load->model('room');
         $this->load->library('table');
 
+        $bookings = [];
+        $rooms = [];
+        
         $rows = $this->booking->get_all();
         foreach ($rows as $row) {
             $booking = new Booking();
@@ -25,33 +28,36 @@ class Admin extends CI_Controller {
             $room->populate($row);
             $rooms[] = $room;
         }
-        
+
         $this->table->set_template([
             'table_open' => '<table id="booking-display" class="table table-hover">']);
         $table_array = [
             [
-                'First Name', 'Last Name', 'Age', 'Nationality', 'Gender', 'Education Provider', 'Room', 'Dates', 'Status', 'Edit'
+                'First Name', 'Last Name', 'Age', 'Nationality', 'Gender', 'Provider', 'Room', 'From', 'To', 'Status', 'Edit'
             ]
         ];
-
-        foreach ($bookings as $booking) {
-            if ($booking->room) {
-                $row = $this->room->get($booking->room_id);
+        if (isset($bookings)) {
+            foreach ($bookings as $booking) {
+                if ($booking->room) {
+                    $row = $this->room->get($booking->room_id);
+                }
+                $dates = explode(' - ', $booking->dates);
+                $room = new Room();
+                $room->populate($row);
+                $table_array[] = [
+                    $booking->first_name,
+                    $booking->last_name,
+                    $booking->age,
+                    $booking->nationality,
+                    $booking->gender,
+                    $booking->education_provider,
+                    $room->name,
+                    $dates[0],
+                    $dates[1],
+                    $booking->status,
+                    '<a href="' . base_url() . 'index.php/admin/add_edit/booking/' . $booking->id . '"><i class="fa fa-pencil-square-o"></i></a>'
+                ];
             }
-            $room = new Room();
-            $room->populate($row);
-            $table_array[] = [
-                $booking->first_name,
-                $booking->last_name,
-                $booking->age,
-                $booking->nationality,
-                $booking->gender,
-                $booking->education_provider,
-                $room->name,
-                $booking->dates,
-                $booking->status,
-                '<a href="'. base_url() . 'index.php/admin/add_edit/booking/'. $booking->id . '"><i class="fa fa-pencil-square-o"></i></a>'
-            ];
         }
 
         $view_data = [

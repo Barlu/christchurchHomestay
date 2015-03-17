@@ -68,6 +68,12 @@ class Booking extends MY_Model {
     public $archive;
     
     /**
+     * 
+     * @var text
+     */
+    public $testimonial;
+    
+    /**
      *
      * @var int timestamp
      */

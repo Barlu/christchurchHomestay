@@ -19,6 +19,13 @@ and open the template in the editor.
     <body>
         <?php echo $body; ?>
         
+
+	<!-- jCalendar CSS - Contains Tipsy CSS - Delete as needed -->
+	<link rel="stylesheet" href="<?php echo base_url(); ?>assets/css/calendar.css" type="text/css" media="screen" title="no title" charset="utf-8">
+
+
+	<!-- Source CalendarJS - Contains Tipsy jQuery Plugin - Delete as needed -->
+	<script src="<?php echo base_url(); ?>assets/js/jquery.calendar/jquery.calendar.js" type="text/javascript" charset="utf-8"></script>
         <script type="text/javascript" src="<?php echo base_url(); ?>assets/js/jquery.validate.min.js"></script>
         <script type="text/javascript" src="<?php echo base_url(); ?>assets/js/moment.min.js"></script>
         <script type="text/javascript" src="<?php echo base_url(); ?>assets/js/daterangepicker.js"></script>

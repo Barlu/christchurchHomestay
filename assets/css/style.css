@@ -26,9 +26,14 @@ h1 {
     min-height: 100%;
 }
 
+#calendar div.pending {
+    background-color: yellow;
+}
+
 #admin-contentWrapper {
  margin: auto;
-  width: 85%;
+ width: 80%;
+  min-width: 1200px;
   background-color: #fff;
   padding: 10px;
   height: 100%;

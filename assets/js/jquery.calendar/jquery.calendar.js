@@ -117,7 +117,7 @@
         
         //
         // Let's append the year
-        $_calendar.append('<div class=\"year\"></div>');
+
         for (var i = 0; i < the_year.length; i++) {
             $_calendar.append('<div class=\"year\">' + the_year[i] + '</div>');
         }
@@ -147,7 +147,7 @@
             //
             // Create a scrollto marker
             $_calendar.append("<div id='" + month + "'></div>");
-            $_calendar.append('<div class=\"label bold\"></div>');
+
             for (var j = 0; j < month.length; j++) {
 
                 //
@@ -189,7 +189,7 @@
         
         $_calendar.append('<div class=\"clear\"></div>');
             for(var j = 0; j < rooms; j++){
-            $_calendar.append('<div class=\"label rooms bold\">' + (j + 1) + '</div>');
+            $_calendar.append('<div class=\"label rooms\">' + (j + 1) + '</div>');
             for (var k = 1; k <= parseInt(month_days[i]); k++) {
 
                 //
@@ -200,7 +200,7 @@
                         today = 'today';
                     }
                 }
-               var current_timestamp = moment(the_year, month, k);
+               var current_timestamp = moment([the_year, i, k]);
                 //
                 // Looping over numbers, apply them to divs
                 $_calendar.append("<div data-date='" + current_timestamp.unix() + "' class='label day " + today + "' data-room='"+ j + "'></div>");
@@ -215,7 +215,17 @@
             // Add a clear for the floated elements
             $_calendar.append('<div class=\"clear\"></div>');
         });
-
+        
+        var date_from = moment(['2012']).unix();
+        var date_to = moment(['2012', '06']).unix();
+        var test_bookings = [
+            {
+                room_id: 3,
+                date_from: date_from,
+                date_to: date_to,
+                status: 'Pending'
+        }
+    ];
         //
         // Loop over the elements and show them one by one.
         for (var k = 0; k < $('.label').length; k++) {
@@ -245,7 +255,8 @@
                 }, (k * 3));
             })(k);
         }
-
+        
+        populate_calendar(2012, test_bookings);
         //
         // Scroll to month
         if (the_year === pl.options.current_year && pl.options.scroll_to_date) {
@@ -721,23 +732,24 @@ function get_rooms(year) {
 //                });
 }
 
-function populate_calender(year, bookings){
+function populate_calendar(year, bookings){
     var range_from = moment(year);
-    var range_to = moment(year, 12, 31);
+    var range_to = moment([year, 12, 31]);
     
     $.each(bookings, function(i, booking){
-        var date_from = moment().unix(bookings.date_from);
-        var date_to = moment().unix(bookings.date_to);
+        var date_from = moment.unix(booking.date_from);
+        var date_to = moment.unix(booking.date_to);
         
-        if(parseInt(date_from.unix()) < parseInt(range_from.unix()) ){
+        if(parseInt(date_from) < parseInt(range_from.unix()) ){
             date_from = range_from;
         }
-        if(parseInt(date_to.unix()) > parseInt(range_to.unix()) ){
+        if(parseInt(date_to) > parseInt(range_to.unix()) ){
             date_to = range_to;
         }
         
-        while (date_from <= date_to){
-            $('div[data-room='+booking.room_id+'][data-date='+date_from.unix()+']').addClass(booking.status);
+        while (date_from.unix() <= date_to.unix()){
+            $('div[data-room="'+booking.room_id+'"][data-date="'+date_from.unix()+'"]').addClass(booking.status.toLowerCase());
+            date_from.add(1, 'd');
         }
     });
 }

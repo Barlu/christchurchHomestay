@@ -192,7 +192,7 @@ class MY_Model extends CI_Model {
      */
     public function save($data, $id = null) {
         $skip_validation = FALSE;
-        if (isset($data['skip_validation'])){
+        if (isset($data['skip_validation'])) {
             $skip_validation = $data['skip_validation'];
         }
         if ($id === null) {
@@ -394,7 +394,19 @@ class MY_Model extends CI_Model {
      */
     public function populate($row) {
         foreach ($row as $key => $value) {
-            $this->$key = $value;
+            if ($key !== 'date_from' || $key !== 'date_to') {
+                $this->$key = $value;
+            } else {
+                if($key === 'date_from'){
+                    $dates[] = date('d/m/y', $row['date_from']);
+                } else if ($key === 'date_to'){
+                    $dates[] = date('d/m/y', $row['date_from']);
+                }
+                if(is_array($dates)){
+                    $dates = implode(' - ', $dates);
+                    $this->dates = $dates;
+                }
+            }
         }
     }
 

@@ -14,14 +14,12 @@ and open the template in the editor.
         <link rel="stylesheet" type="text/css" href="<?php echo base_url(); ?>assets/css/daterangepicker-bs3.css" />
         <link rel="stylesheet" type="text/css" href="<?php echo base_url(); ?>assets/font-awesome/css/font-awesome.min.css" />
         <link rel="stylesheet" type="text/css" href="<?php echo base_url(); ?>assets/css/style.css" />
+        <link rel="stylesheet" type="text/css" href="<?php echo base_url(); ?>assets/css/jquery.calendar.css" />
         <script type="text/javascript" src="<?php echo base_url(); ?>assets/js/jquery-1.11.2.min.js"></script>
     </head>
     <body>
         <?php echo $body; ?>
-        
-
-	<!-- jCalendar CSS - Contains Tipsy CSS - Delete as needed -->
-	<link rel="stylesheet" href="<?php echo base_url(); ?>assets/css/calendar.css" type="text/css" media="screen" title="no title" charset="utf-8">
+       
 
 
 	<!-- Source CalendarJS - Contains Tipsy jQuery Plugin - Delete as needed -->

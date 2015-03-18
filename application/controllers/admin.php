@@ -131,6 +131,10 @@ class Admin extends CI_Controller {
     }
 
     private function _save_booking($id) {
+        $dates = explode(' - ', $this->input->post('dates'));
+        $date_from = DateTime::createFromFormat('d/m/Y', $dates[0]);   
+        $date_to = DateTime::createFromFormat('d/m/Y', $dates[1]); 
+        
         $data = [
             'room_id' => $this->input->post('room_id'),
             'first_name' => $this->input->post('first_name'),
@@ -139,7 +143,8 @@ class Admin extends CI_Controller {
             'gender' => $this->input->post('gender'),
             'age' => $this->input->post('age'),
             'education_provider' => $this->input->post('education_provider'),
-            'dates' => $this->input->post('dates'),
+            'date_from' => $date_from->getTimestamp(),
+            'date_to' => $date_to->getTimestamp(),
             'status' => $this->input->post('status'),
             'last_updated' => now()
         ];

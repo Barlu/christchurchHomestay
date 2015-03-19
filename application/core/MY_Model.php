@@ -394,20 +394,21 @@ class MY_Model extends CI_Model {
      */
     public function populate($row) {
         foreach ($row as $key => $value) {
-            if ($key !== 'date_from' || $key !== 'date_to') {
+            if ($key !== 'date_from' && $key !== 'date_to') {
                 $this->$key = $value;
             } else {
                 if($key === 'date_from'){
-                    $dates[] = date('d/m/y', $row['date_from']);
+                    $dates[] = date('d/m/Y', $value);
                 } else if ($key === 'date_to'){
-                    $dates[] = date('d/m/y', $row['date_from']);
+                    $dates[] = date('d/m/Y', $value);
                 }
-                if(is_array($dates)){
+                if(isset($dates[1])){
                     $dates = implode(' - ', $dates);
                     $this->dates = $dates;
                 }
             }
         }
+        return  $this;
     }
 
     /* --------------------------------------------------------------

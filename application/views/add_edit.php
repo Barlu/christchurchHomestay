@@ -5,14 +5,14 @@
         ?>
         <div class="form-group col-xs-12 has-feedback">
             <?php
-            echo form_label('Room Name', 'name', [
+            echo form_label('Room Number', 'number', [
                 'class' => 'control-label sr-only'
             ]);
             echo form_input([
-                'name' => 'name',
-                'id' => 'name',
+                'name' => 'number',
+                'id' => 'number',
                 'class' => 'form-control input-lg',
-                'placeholder' => 'Room Name',
+                'placeholder' => 'Room Number',
                 'data-toggle' => 'tooltip'
             ]);
             ?>

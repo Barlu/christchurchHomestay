@@ -18,8 +18,7 @@ class Admin extends CI_Controller {
         $rows = $this->booking->get_all();
         foreach ($rows as $row) {
             $booking = new Booking();
-            $booking->populate($row);
-            $bookings[] = $booking;
+            $bookings[] = $booking->populate($row);
         }
 
         $rows = $this->room->get_all();
@@ -74,7 +73,7 @@ class Admin extends CI_Controller {
         $this->load->model('room');
         //Set vars
         $view_data = [];
-        $view_data['status'] = ['Not Selected' => 'Status', 'Pending' => 'Pending', 'Confirmed' => 'Confirmed', 'indefinate' => 'Indefinate'];
+        $view_data['status'] = ['Not Selected' => 'Status', 'Pending' => 'Pending', 'Confirmed' => 'Confirmed', 'Indefinate' => 'Indefinate'];
         $view_data['rooms'] = $this->_get_rooms();
 
         if ($type === 'room') {
@@ -111,7 +110,7 @@ class Admin extends CI_Controller {
             foreach ($rows as $row) {
                 $room = new Room();
                 $room->populate($row);
-                $rooms[$room->id] = $room->name;
+                $rooms[$room->id] = $room->number;
             }
         } else {
             $rooms[] = 'No rooms found';
@@ -121,7 +120,7 @@ class Admin extends CI_Controller {
 
     private function _save_room($id) {
         $data = [
-            'name' => $this->input->post('name'),
+            'number' => $this->input->post('number'),
             'last_modified' => now()
         ];
 
@@ -132,9 +131,8 @@ class Admin extends CI_Controller {
 
     private function _save_booking($id) {
         $dates = explode(' - ', $this->input->post('dates'));
-        $date_from = DateTime::createFromFormat('d/m/Y', $dates[0]);   
+        $date_from = DateTime::createFromFormat('d/m/Y', $dates[0]);
         $date_to = DateTime::createFromFormat('d/m/Y', $dates[1]); 
-        
         $data = [
             'room_id' => $this->input->post('room_id'),
             'first_name' => $this->input->post('first_name'),

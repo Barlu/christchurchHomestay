@@ -82,13 +82,13 @@
     //
     // Init
     Calendar.prototype.init = function () {
+        //Get number of rooms to create calander then call print in callback
+        this.getRooms($.proxy(this.print, this));
 
-        //
-        // Call print - who knows, maybe more will be added to the init function...
-        this.print();
+
     };
 
-    Calendar.prototype.print = function (year) {
+    Calendar.prototype.print = function (rooms, year) {
 
         //
         // Pass in any year you damn like.
@@ -109,12 +109,7 @@
         //
         // Set reference for calendar DOM object
         var $_calendar = $('#calendar');
-        
 
-        
-        var rooms = get_rooms(the_year);
-        
-        
         //
         // Let's append the year
 
@@ -137,23 +132,17 @@
         // Add a clear for the floated elements
         $_calendar.append('<div class=\"clear\"></div>');
 
-        
-        
-
         //
         // Loop over the month arrays, loop over the characters in teh string, and apply to divs.
         $.each(month_array, function (i, month) {
-            
             //
             // Create a scrollto marker
             $_calendar.append("<div id='" + month + "'></div>");
 
             for (var j = 0; j < month.length; j++) {
-
                 //
                 // Looping over characters, apply them to divs
                 $_calendar.append('<div class=\"label bold\">' + month[j] + '</div>');
-
             }
             ;
 
@@ -186,46 +175,39 @@
                 // Looping over numbers, apply them to divs
                 $_calendar.append("<div data-date='" + (parseInt(i) + 1) + '/' + j + '/' + the_year + "' class='label day " + today + "'>" + j + '</div>');
             }
-        
-        $_calendar.append('<div class=\"clear\"></div>');
-            for(var j = 0; j < rooms; j++){
-            $_calendar.append('<div class=\"label rooms\">' + (j + 1) + '</div>');
-            for (var k = 1; k <= parseInt(month_days[i]); k++) {
 
-                //
-                // Check for today
-                var today = '';
-                if (i === pl.options.month && the_year === d.getFullYear()) {
-                    if (j === pl.options.today) {
-                        today = 'today';
-                    }
-                }
-               var current_timestamp = moment([the_year, i, k]);
-                //
-                // Looping over numbers, apply them to divs
-                $_calendar.append("<div data-date='" + current_timestamp.unix() + "' class='label day " + today + "' data-room='"+ j + "'></div>");
-            }
             $_calendar.append('<div class=\"clear\"></div>');
-        }
+            
+            $.each(rooms, function(j, room){
+                $_calendar.append('<div class=\"label rooms\">' + room.number + '</div>');
+                for (var k = 1; k <= parseInt(month_days[i]); k++) {
 
-        $_calendar.append('<div class=\"clear\"></div>');
-       
+                    //
+                    // Check for today
+                    var today = '';
+                    if (i === pl.options.month && the_year === d.getFullYear()) {
+                        if (j === pl.options.today) {
+                            today = 'today';
+                        }
+                    }
+                    var current_timestamp = moment([the_year, i, k]);
+                    //
+                    // Looping over numbers, apply them to divs
+                    $_calendar.append("<div data-date='" + current_timestamp.unix() + "' class='label day " + today + "' data-room='" + room.id + "'></div>");
+                }
+                $_calendar.append('<div class=\"clear\"></div>');
+            });
+
+
+            $_calendar.append('<div class=\"clear\"></div>');
+
 
             //
             // Add a clear for the floated elements
             $_calendar.append('<div class=\"clear\"></div>');
         });
-        
-        var date_from = moment(['2012']).unix();
-        var date_to = moment(['2012', '06']).unix();
-        var test_bookings = [
-            {
-                room_id: 3,
-                date_from: date_from,
-                date_to: date_to,
-                status: 'Pending'
-        }
-    ];
+
+
         //
         // Loop over the elements and show them one by one.
         for (var k = 0; k < $('.label').length; k++) {
@@ -243,7 +225,7 @@
                         $(this).on('click', function () {
                             if (typeof pl.options.click_callback == 'function') {
                                 var d = $(this).attr('data-date').split("/");
-                                var dObj = {}
+                                var dObj = {};
                                 dObj.day = d[1];
                                 dObj.month = d[0];
                                 dObj.year = d[2];
@@ -256,7 +238,8 @@
             })(k);
         }
         
-        populate_calendar(2012, test_bookings);
+        this.getBookings(the_year);
+
         //
         // Scroll to month
         if (the_year === pl.options.current_year && pl.options.scroll_to_date) {
@@ -278,7 +261,7 @@
         //
         // Tipsy
         $('.label').tipsy({gravity: pl.options.tipsy_gravity});
-    }
+    };
 
     //
     // Previous / Next Year on click events
@@ -339,6 +322,67 @@
         });
     }
 
+    Calendar.prototype.getBookings = function (year) {
+        var range_from = moment([year]);
+        range_from.local();
+        var range_to = moment([year, 12, 31]);
+range_to.local();
+        $.ajax({
+            url: '../ajax/getBookings',
+            type: "GET",
+            data: {
+                'range_from': range_from.unix(),
+                'range_to': range_to.unix()
+            },
+            dataType: 'json'
+        })
+                .done(function (data) {
+                    if (data.response === 'success') {
+                        pl.populateCalendar(year, data.bookings);
+                    } else {
+                        console.log(false);
+                        return false;
+                    }
+                });
+    }
+
+    Calendar.prototype.populateCalendar = function (year, bookings) {
+        var range_from = moment([year]);
+        var range_to = moment([year, 11, 31]);
+
+        $.each(bookings, function (i, booking) {
+            var date_from = moment.unix(booking.date_from);
+            date_from.startOf('day');
+            var date_to = moment.unix(booking.date_to);
+            date_to.startOf('day');
+            if (parseInt(date_from.unix()) < parseInt(range_from.unix())) {
+                date_from = moment(range_from);
+            }
+            if (parseInt(date_to.unix()) > parseInt(range_to.unix())) {
+                date_to = moment(range_to);
+            }
+
+            while (date_from.unix() <= date_to.unix()) {
+                $('div[data-room="' + booking.room_id + '"][data-date="' + date_from.unix() + '"]').addClass(booking.status.toLowerCase());
+                date_from.add(1, 'd');
+            }
+        });
+    }
+
+    Calendar.prototype.getRooms = function (callback) {
+        $.ajax({
+            url: '../ajax/getRooms',
+            type: "GET",
+            dataType: 'json'
+        })
+                .done(function (data) {
+                    if (callback === undefined) {
+                        return data.rooms;
+                    }
+
+                    callback(data.rooms);
+                });
+    }
 })(jQuery, window, document);
 
 
@@ -707,49 +751,3 @@
 )(jQuery);
 
 
-function get_rooms(year) {
-    var rooms = 7;
-    return rooms;
-
-
-
-//    $.ajax({
-//            url: '../Ajax/get_rooms.php',
-//            type: "GET",
-//            data: {
-//                'email': email,
-//                'exists': EXISTS,
-//                'success': SUCCESS
-//            },
-//            dataType: 'json'
-//        })
-//                .done(function(data) {
-//                    if (data.response === SUCCESS) {
-//                        return true;
-//                    } else {
-//                        return false;
-//                    }
-//                });
-}
-
-function populate_calendar(year, bookings){
-    var range_from = moment(year);
-    var range_to = moment([year, 12, 31]);
-    
-    $.each(bookings, function(i, booking){
-        var date_from = moment.unix(booking.date_from);
-        var date_to = moment.unix(booking.date_to);
-        
-        if(parseInt(date_from) < parseInt(range_from.unix()) ){
-            date_from = range_from;
-        }
-        if(parseInt(date_to) > parseInt(range_to.unix()) ){
-            date_to = range_to;
-        }
-        
-        while (date_from.unix() <= date_to.unix()){
-            $('div[data-room="'+booking.room_id+'"][data-date="'+date_from.unix()+'"]').addClass(booking.status.toLowerCase());
-            date_from.add(1, 'd');
-        }
-    });
-}

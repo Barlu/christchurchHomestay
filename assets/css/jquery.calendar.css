@@ -40,7 +40,7 @@
 	margin: 1px 0 0 1px;
 	text-align: center;
 	float: left;
-	background: #000;	
+	background: #003354;	
 }
 
 #calendar .label:hover {
@@ -53,7 +53,7 @@
 
 #calendar .label.bold {
 	color: #FFF;
-	background: #000;
+	background: #003354;
 	text-transform: uppercase;
 }
 
@@ -63,7 +63,7 @@
 }
 
 #calendar #arrows .next {
-	background: #000 url('../images/arrow-next.gif') no-repeat center center;
+	background: #003354 url('../images/arrow-next.gif') no-repeat center center;
 	width: 34px;
 	height: 34px;
 	margin: 1px 0 1px 1px;
@@ -74,7 +74,7 @@
 }
 
 #calendar #arrows .prev {
-	background: #000 url('../images/arrow-prev.gif') no-repeat center center;
+	background: #003354 url('../images/arrow-prev.gif') no-repeat center center;
 	width: 34px;
 	height: 34px;
 	margin-left: 1px;

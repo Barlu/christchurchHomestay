@@ -8,10 +8,9 @@ class Booking extends MY_Model {
     public $id;
     
     /**
-     * Foreign Key
      * @var string
      */
-    public $room_id;
+    public $room_number;
     
     /**
      *

@@ -14,8 +14,8 @@
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-(function ($, window, document) {
-
+(function($, window, document) {
+    var base_url = window.location.origin + '/christchurchHomestay/';
     //
     // Globals
     var pluginName = 'calendar',
@@ -81,22 +81,22 @@
 
     //
     // Init
-    Calendar.prototype.init = function () {
+    Calendar.prototype.init = function() {
         //Get number of rooms to create calander then call print in callback
-        this.getRooms($.proxy(this.print, this));
+        this.getRooms(pl.print);
 
 
     };
 
-    Calendar.prototype.print = function (rooms, year) {
+    Calendar.prototype.print = function(rooms, year) {
 
         //
         // Pass in any year you damn like.
-        var the_year = (year) ? year : pl.options.year;
+        var the_year = (year) ? year.toString() : pl.options.year.toString();
 
         //
         // First, clear the element
-        $(this.element).empty();
+        $(pl.element).empty();
 
         $('.label').css({
             display: 'none'
@@ -104,7 +104,7 @@
 
         //
         // Append parent div to the element
-        $(this.element).append('<div id=\"calendar\"></div>');
+        $(pl.element).append('<div id=\"calendar\"></div>');
 
         //
         // Set reference for calendar DOM object
@@ -112,7 +112,7 @@
 
         //
         // Let's append the year
-
+        
         for (var i = 0; i < the_year.length; i++) {
             $_calendar.append('<div class=\"year\">' + the_year[i] + '</div>');
         }
@@ -134,7 +134,7 @@
 
         //
         // Loop over the month arrays, loop over the characters in teh string, and apply to divs.
-        $.each(month_array, function (i, month) {
+        $.each(month_array, function(i, month) {
             //
             // Create a scrollto marker
             $_calendar.append("<div id='" + month + "'></div>");
@@ -177,9 +177,9 @@
             }
 
             $_calendar.append('<div class=\"clear\"></div>');
-            
-            $.each(rooms, function(j, room){
-                $_calendar.append('<div class=\"label rooms\">' + room.number + '</div>');
+
+            $.each(rooms, function(j, room) {
+                $_calendar.append('<div class=\"label rooms\">' + room.room_number + '</div>');
                 for (var k = 1; k <= parseInt(month_days[i]); k++) {
 
                     //
@@ -193,7 +193,7 @@
                     var current_timestamp = moment([the_year, i, k]);
                     //
                     // Looping over numbers, apply them to divs
-                    $_calendar.append("<div data-date='" + current_timestamp.unix() + "' class='label day " + today + "' data-room='" + room.id + "'></div>");
+                    $_calendar.append("<div data-date='" + current_timestamp.unix() + "' class='label day " + today + "' data-room='" + room.room_number + "'></div>");
                 }
                 $_calendar.append('<div class=\"clear\"></div>');
             });
@@ -211,18 +211,18 @@
         //
         // Loop over the elements and show them one by one.
         for (var k = 0; k < $('.label').length; k++) {
-            (function (j) {
-                setTimeout(function () {
+            (function(j) {
+                setTimeout(function() {
 
                     //
                     // Fade the labels in
-                    $($('.label')[j]).fadeIn('fast', function () {
+                    $($('.label')[j]).fadeIn('fast', function() {
 
                         //
                         // Set titles for tipsy once in DOM
                         $(this).attr('original-title', pl.returnFormattedDate($(this).attr('data-date')));
 
-                        $(this).on('click', function () {
+                        $(this).on('click', function() {
                             if (typeof pl.options.click_callback == 'function') {
                                 var d = $(this).attr('data-date').split("/");
                                 var dObj = {};
@@ -237,16 +237,16 @@
                 }, (k * 3));
             })(k);
         }
-        
-        this.getBookings(the_year);
+
+        pl.getBookings(the_year);
 
         //
         // Scroll to month
         if (the_year === pl.options.current_year && pl.options.scroll_to_date) {
             var print_finished = false;
-            var print_check = setInterval(function () {
+            var print_check = setInterval(function() {
                 print_finished = true;
-                $.each($(".label"), function () {
+                $.each($(".label"), function() {
                     if ($(this).css("display") === "none") {
                         print_finished = false;
                     }
@@ -265,21 +265,21 @@
 
     //
     // Previous / Next Year on click events
-    $(document).on('click', '.next', function () {
+    $(document).on('click', '.next', function() {
         pl.options.year = parseInt(pl.options.year) + 1;
 
-        pl.print(pl.options.year);
+        pl.getRooms(pl.print, pl.options.year);
     });
 
-    $(document).on('click', '.prev', function () {
+    $(document).on('click', '.prev', function() {
         pl.options.year = parseInt(pl.options.year) - 1;
 
-        pl.print(pl.options.year);
+        pl.getRooms(pl.print, pl.options.year);
     });
 
     //
     // Simple JS function to check if leap year
-    Calendar.prototype.isLeap = function (year) {
+    Calendar.prototype.isLeap = function(year) {
         var leap = 0;
         leap = new Date(year, 1, 29).getMonth() == 1;
         return leap;
@@ -287,7 +287,7 @@
 
     //
     // Method to return full date
-    Calendar.prototype.returnFormattedDate = function (date) {
+    Calendar.prototype.returnFormattedDate = function(date) {
         var returned_date;
         var d = new Date(date);
         var da = d.getDay();
@@ -314,21 +314,21 @@
 
     //
     // Plugin Instantiation
-    $.fn[pluginName] = function (options) {
-        return this.each(function () {
+    $.fn[pluginName] = function(options) {
+        return this.each(function() {
             if (!$.data(this, 'plugin_' + pluginName)) {
                 $.data(this, 'plugin_' + pluginName, new Calendar(this, options));
             }
         });
     }
 
-    Calendar.prototype.getBookings = function (year) {
+    Calendar.prototype.getBookings = function(year) {
         var range_from = moment([year]);
         range_from.local();
         var range_to = moment([year, 12, 31]);
-range_to.local();
+        range_to.local();
         $.ajax({
-            url: '../ajax/getBookings',
+            url: base_url + 'ajax/get_bookings',
             type: "GET",
             data: {
                 'range_from': range_from.unix(),
@@ -336,7 +336,7 @@ range_to.local();
             },
             dataType: 'json'
         })
-                .done(function (data) {
+                .done(function(data) {
                     if (data.response === 'success') {
                         pl.populateCalendar(year, data.bookings);
                     } else {
@@ -346,11 +346,11 @@ range_to.local();
                 });
     }
 
-    Calendar.prototype.populateCalendar = function (year, bookings) {
+    Calendar.prototype.populateCalendar = function(year, bookings) {
         var range_from = moment([year]);
         var range_to = moment([year, 11, 31]);
 
-        $.each(bookings, function (i, booking) {
+        $.each(bookings, function(i, booking) {
             var date_from = moment.unix(booking.date_from);
             date_from.startOf('day');
             var date_to = moment.unix(booking.date_to);
@@ -363,24 +363,24 @@ range_to.local();
             }
 
             while (date_from.unix() <= date_to.unix()) {
-                $('div[data-room="' + booking.room_id + '"][data-date="' + date_from.unix() + '"]').addClass(booking.status.toLowerCase());
+                $('div[data-room="' + booking.room_number + '"][data-date="' + date_from.unix() + '"]').addClass(booking.status.toLowerCase());
                 date_from.add(1, 'd');
             }
         });
     }
 
-    Calendar.prototype.getRooms = function (callback) {
+    Calendar.prototype.getRooms = function(callback, year) {
         $.ajax({
-            url: '../ajax/getRooms',
+            url: base_url + 'ajax/get_rooms',
             type: "GET",
             dataType: 'json'
         })
-                .done(function (data) {
+                .done(function(data) {
                     if (callback === undefined) {
                         return data.rooms;
                     }
 
-                    callback(data.rooms);
+                    callback(data.rooms, year);
                 });
     }
 })(jQuery, window, document);
@@ -392,7 +392,7 @@ range_to.local();
 // (c) 2008-2010 jason frame [jason@onehackoranother.com]
 // released under the MIT license
 
-(function ($) {
+(function($) {
 
     function maybeCall(thing, ctx) {
         return (typeof thing == 'function') ? (thing.call(ctx)) : thing;
@@ -408,7 +408,7 @@ range_to.local();
     ;
 
     Tipsy.prototype = {
-        show: function () {
+        show: function() {
             var title = this.getTitle();
             if (title && this.enabled) {
                 var $tip = this.tip();
@@ -463,22 +463,22 @@ range_to.local();
                 }
             }
         },
-        hide: function () {
+        hide: function() {
             if (this.options.fade) {
-                this.tip().stop().fadeOut(function () {
+                this.tip().stop().fadeOut(function() {
                     $(this).remove();
                 });
             } else {
                 this.tip().remove();
             }
         },
-        fixTitle: function () {
+        fixTitle: function() {
             var $e = this.$element;
             if ($e.attr('title') || typeof ($e.attr('original-title')) != 'string') {
                 $e.attr('original-title', $e.attr('title') || '').removeAttr('title');
             }
         },
-        getTitle: function () {
+        getTitle: function() {
             var title, $e = this.$element, o = this.options;
             this.fixTitle();
             var title, o = this.options;
@@ -490,31 +490,31 @@ range_to.local();
             title = ('' + title).replace(/(^\s*|\s*$)/, '');
             return title || o.fallback;
         },
-        tip: function () {
+        tip: function() {
             if (!this.$tip) {
                 this.$tip = $('<div class="tipsy"></div>').html('<div class="tipsy-arrow"></div><div class="tipsy-inner"></div>');
             }
             return this.$tip;
         },
-        validate: function () {
+        validate: function() {
             if (!this.$element[0].parentNode) {
                 this.hide();
                 this.$element = null;
                 this.options = null;
             }
         },
-        enable: function () {
+        enable: function() {
             this.enabled = true;
         },
-        disable: function () {
+        disable: function() {
             this.enabled = false;
         },
-        toggleEnabled: function () {
+        toggleEnabled: function() {
             this.enabled = !this.enabled;
         }
     };
 
-    $.fn.tipsy = function (options) {
+    $.fn.tipsy = function(options) {
 
         if (options === true) {
             return this.data('tipsy');
@@ -543,7 +543,7 @@ range_to.local();
                 tipsy.show();
             } else {
                 tipsy.fixTitle();
-                setTimeout(function () {
+                setTimeout(function() {
                     if (tipsy.hoverState == 'in')
                         tipsy.show();
                 }, options.delayIn);
@@ -557,7 +557,7 @@ range_to.local();
             if (options.delayOut == 0) {
                 tipsy.hide();
             } else {
-                setTimeout(function () {
+                setTimeout(function() {
                     if (tipsy.hoverState == 'out')
                         tipsy.hide();
                 }, options.delayOut);
@@ -566,7 +566,7 @@ range_to.local();
         ;
 
         if (!options.live)
-            this.each(function () {
+            this.each(function() {
                 get(this);
             });
 
@@ -600,15 +600,15 @@ range_to.local();
     // For example, you could store the gravity in a 'tipsy-gravity' attribute:
     // return $.extend({}, options, {gravity: $(ele).attr('tipsy-gravity') || 'n' });
     // (remember - do not modify 'options' in place!)
-    $.fn.tipsy.elementOptions = function (ele, options) {
+    $.fn.tipsy.elementOptions = function(ele, options) {
         return $.metadata ? $.extend({}, options, $(ele).metadata()) : options;
     };
 
-    $.fn.tipsy.autoNS = function () {
+    $.fn.tipsy.autoNS = function() {
         return $(this).offset().top > ($(document).scrollTop() + $(window).height() / 2) ? 's' : 'n';
     };
 
-    $.fn.tipsy.autoWE = function () {
+    $.fn.tipsy.autoWE = function() {
         return $(this).offset().left > ($(document).scrollLeft() + $(window).width() / 2) ? 'e' : 'w';
     };
 
@@ -627,8 +627,8 @@ range_to.local();
      *        that element's tooltip to be 'se', preserving the southern
      *        component.
      */
-    $.fn.tipsy.autoBounds = function (margin, prefer) {
-        return function () {
+    $.fn.tipsy.autoBounds = function(margin, prefer) {
+        return function() {
             var dir = {ns: prefer[0], ew: (prefer.length > 1 ? prefer[1] : false)},
             boundTop = $(document).scrollTop() + margin,
                     boundLeft = $(document).scrollLeft() + margin,
@@ -660,16 +660,16 @@ range_to.local();
  * http://flesler.blogspot.com/2007/10/jqueryscrollto.html
  */
 ;
-(function (d) {
-    var k = d.scrollTo = function (a, i, e) {
+(function(d) {
+    var k = d.scrollTo = function(a, i, e) {
         d(window).scrollTo(a, i, e)
     };
     k.defaults = {axis: 'xy', duration: parseFloat(d.fn.jquery) >= 1.3 ? 0 : 1};
-    k.window = function (a) {
+    k.window = function(a) {
         return d(window)._scrollable()
     };
-    d.fn._scrollable = function () {
-        return this.map(function () {
+    d.fn._scrollable = function() {
+        return this.map(function() {
             var a = this, i = !a.nodeName || d.inArray(a.nodeName.toLowerCase(), ['iframe', '#document', 'html', 'body']) != -1;
             if (!i)
                 return a;
@@ -677,7 +677,7 @@ range_to.local();
             return d.browser.safari || e.compatMode == 'BackCompat' ? e.body : e.documentElement
         })
     };
-    d.fn.scrollTo = function (n, j, b) {
+    d.fn.scrollTo = function(n, j, b) {
         if (typeof j == 'object') {
             b = j;
             j = 0
@@ -693,7 +693,7 @@ range_to.local();
             j /= 2;
         b.offset = p(b.offset);
         b.over = p(b.over);
-        return this._scrollable().each(function () {
+        return this._scrollable().each(function() {
             var q = this, r = d(q), f = n, s, g = {}, u = r.is('html,body');
             switch (typeof f) {
                 case'number':
@@ -707,7 +707,7 @@ range_to.local();
                     if (f.is || f.style)
                         s = (f = d(f)).offset()
             }
-            d.each(b.axis.split(''), function (a, i) {
+            d.each(b.axis.split(''), function(a, i) {
                 var e = i == 'x' ? 'Left' : 'Top', h = e.toLowerCase(), c = 'scroll' + e, l = q[c], m = k.max(q, i);
                 if (s) {
                     g[c] = s[h] + (u ? 0 : l - r.offset()[h]);
@@ -732,13 +732,13 @@ range_to.local();
             });
             t(b.onAfter);
             function t(a) {
-                r.animate(g, j, b.easing, a && function () {
+                r.animate(g, j, b.easing, a && function() {
                     a.call(this, n, b)
                 })
             }}
         ).end()
     };
-    k.max = function (a, i) {
+    k.max = function(a, i) {
         var e = i == 'x' ? 'Width' : 'Height', h = 'scroll' + e;
         if (!d(a).is('html,body'))
             return a[h] - d(a)[e.toLowerCase()]();

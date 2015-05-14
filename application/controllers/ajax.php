@@ -2,7 +2,7 @@
 
 class Ajax extends CI_Controller {
 
-    public function getBookings() {
+    public function get_bookings() {
         $data['range_from'] = $this->input->get('range_from');
         $data['range_to'] = $this->input->get('range_to');
 
@@ -24,11 +24,17 @@ class Ajax extends CI_Controller {
         echo json_encode($responseData);
     }
 
-    public function getRooms() {
-        $this->load->model('room');
-$this->room->order_by('number', 'ASC');
-        $rows = $this->room->get_all();
+    public function get_rooms() {
+        $q = $this->db->query(
+                'SELECT DISTINCT room_number'
+                . ' FROM bookings'
+                . ' ORDER BY room_number ASC');
 
+        
+        foreach ($q->result() as $row) {
+            $rows[] = $row;
+        }
+        
         $responseData['rooms'] = $rows;
         $responseData['response'] = 'success';
         echo json_encode($responseData);
